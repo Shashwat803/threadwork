@@ -5,6 +5,8 @@ import ApiError from "../utils/ApiError";
 import asyncHandler from "../utils/asyncHandler";
 
 
+//need to add user id 
+
 const createPost = asyncHandler(async (req: Request, res: Response) => {
     const uploadedFiles: string[] = []
     const { text, caption } = req.body

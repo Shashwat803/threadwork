@@ -10,5 +10,5 @@ export interface IUserProfile {
     userId: mongoose.Schema.Types.ObjectId
     fullname: string,
     bio?: string
-    avatar?: string
+    profileImage?: string
 }

@@ -5,7 +5,7 @@ const userProfileSchema = new mongoose.Schema<IUserProfile>({
     userId:{
      type:mongoose.Schema.Types.ObjectId,
      ref:'User',
-     required:'true'
+    //  required:'true'
     },
     fullname: {
         type: String,
@@ -14,9 +14,10 @@ const userProfileSchema = new mongoose.Schema<IUserProfile>({
     bio:{
         type:String,
     },
-    avatar:{
+    profileImage:{
         type:String
     }
 },{timestamps:true})
 
-export default mongoose.model("UserProfile", userProfileSchema)
+const Profile = mongoose.model("UserProfile", userProfileSchema)
+export default Profile
