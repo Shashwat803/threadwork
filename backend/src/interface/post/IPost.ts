@@ -8,11 +8,9 @@ export interface IComment{
 
 export interface IPost {
     user: mongoose.Schema.Types.ObjectId,
-    text: string,
-    image: string,
-    video: string,
-    caption: string
-    likes: [mongoose.Schema.Types.ObjectId],
-    comments: [mongoose.Schema.Types.ObjectId],
-
+    text?: string,
+    mediaFiles?: string[],
+    caption?: string
+    likes?: mongoose.Schema.Types.ObjectId[],
+    comments?: mongoose.Schema.Types.ObjectId[],
 } 

@@ -1,7 +1,5 @@
-
 import mongoose from "mongoose";
 import { IComment, IPost } from "../../interface/post/IPost";
-
 
 const commentSchema = new mongoose.Schema<IComment>({
     user: {
@@ -20,18 +18,16 @@ const commentSchema = new mongoose.Schema<IComment>({
 const postSchema = new mongoose.Schema<IPost>({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        index:true
     },
     text: {
         type: String,
         trim: true
     },
-    image: {
+    mediaFiles:[{
         type: String
-    },
-    video: {
-        type: String
-    },
+    }],
     caption: {
         type: String,
         max: [200, "Caption should be max 200 character"]
@@ -47,12 +43,13 @@ const postSchema = new mongoose.Schema<IPost>({
     toObject: { virtuals: true }
 })
 
+
 postSchema.virtual('likeCount').get(function () {
-    return this.likes.length;
+    return this.likes?.length;
 });
 
 postSchema.virtual('commentCount').get(function () {
-    return this.comments.length;
+    return this.comments?.length;
 });
 
 const Comment = mongoose.model("Comment", commentSchema)
