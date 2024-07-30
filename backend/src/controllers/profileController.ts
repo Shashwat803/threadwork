@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler";
 import Profile from "../models/user/UserProfile.model";
 import ApiError from "../utils/ApiError";
-import cloudinaryUpload from "../utils/CloudinaryFileUpload";
+import cloudinaryUpload from "../utils/cloudinaryFileUpload";
 
 // need to add user id
 const createProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -21,7 +21,21 @@ const createProfile = asyncHandler(async (req: Request, res: Response) => {
         bio,
         profileImage: uploadedProfileImage
     })
-    return res.status(201).json(profile)
+    return res.status(201).json({
+      data:profile,
+      success:true,
+      message:"Profile created successfully"
+    })
 })
 
-export { createProfile }
+const getOwnerProfile = asyncHandler(async (req: Request, res: Response) => {
+    //req.id of owner
+    const ownerProfile = await Profile.find()
+    return res.status(200).json({
+        data:ownerProfile,
+        success:true,
+        message:"Profile fetched successfully"
+      })
+})
+// const getUserProfile
+export { createProfile, getOwnerProfile }

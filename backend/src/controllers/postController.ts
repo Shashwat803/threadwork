@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Post } from "../models/post/Post.model";
-import cloudinaryUpload from "../utils/CloudinaryFileUpload";
+import cloudinaryUpload from "../utils/cloudinaryFileUpload";
 import ApiError from "../utils/ApiError";
 import asyncHandler from "../utils/asyncHandler";
 
@@ -32,12 +32,20 @@ const createPost = asyncHandler(async (req: Request, res: Response) => {
         caption: caption || ''
     })
 
-    return res.status(201).json(post)
+    return res.status(201).json({
+        data:post,
+        success:true,
+        message:"Post created successfully"
+      })
 
 })
 const getAllPost = asyncHandler(async (req: Request, res: Response) => {
     const allPosts = await Post.find().select("text imagesOrVideos likes comments createdAt likeCount commentCount")
-    res.status(200).json(allPosts)
+    return res.status(201).json({
+        data:allPosts,
+        success:true,
+        message:"Posts fetched successfully"
+      })
 })
 
 const usersPost = asyncHandler(async (req: Request, res: Response) => {
