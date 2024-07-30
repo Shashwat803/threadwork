@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { Post } from "../models/post/Post.model";
+import { Comment, Post } from "../models/post/Post.model";
 import cloudinaryUpload from "../utils/cloudinaryFileUpload";
 import ApiError from "../utils/ApiError";
 import asyncHandler from "../utils/asyncHandler";
+import { AuthRequest } from "../interface/auth/IAuth";
 
 
 //need to add user id 
@@ -27,32 +28,95 @@ const createPost = asyncHandler(async (req: Request, res: Response) => {
     await Promise.all(uploadPromises)
 
     const post = await Post.create({
+        user: (req as AuthRequest).user.id,
         text: text || '',
         mediaFiles: uploadedFiles,
         caption: caption || ''
     })
 
     return res.status(201).json({
-        data:post,
-        success:true,
-        message:"Post created successfully"
-      })
+        data: post,
+        success: true,
+        message: "Post created successfully"
+    })
 
 })
+
+const deletePost = asyncHandler(async (req: Request, res: Response) => {
+    const postId = req.params.id
+    await Post.deleteOne({ _id: postId })
+    return res.status(200).json({
+        success: true,
+        message: "Post deleted"
+    })
+})
+
 const getAllPost = asyncHandler(async (req: Request, res: Response) => {
     const allPosts = await Post.find().select("text imagesOrVideos likes comments createdAt likeCount commentCount")
-    return res.status(201).json({
-        data:allPosts,
-        success:true,
-        message:"Posts fetched successfully"
-      })
+    return res.status(200).json({
+        data: allPosts,
+        success: true,
+        message: "Posts fetched successfully"
+    })
 })
 
 const usersPost = asyncHandler(async (req: Request, res: Response) => {
-       // req.User_id
-        const allPosts = await Post.find({}).select("text imagesOrVideos likes comments createdAt likeCount commentCount")
-        res.status(200).json(allPosts)
-   
+    const allPosts = await Post.find({ _id: (req as AuthRequest).user.id }).select("text imagesOrVideos likes comments createdAt likeCount commentCount")
+    return res.status(200).json({
+        data: allPosts,
+        success: true,
+        message: "Posts fetched successfully"
+    })
 })
 
-export { createPost, getAllPost }
+const createComment = asyncHandler(async (req: Request, res: Response) => {
+    const postId = req.params.id
+    const { comment } = req.body
+    if (!comment) {
+        throw new ApiError(400, "Comment empty")
+    }
+    const post = await Post.findById({ _id: postId })
+    if (!post) {
+        throw new ApiError(400, "Post not found")
+    }
+    const commentBody = new Comment({
+        user: (req as AuthRequest).user.id,
+        text: comment
+    })
+    if (!commentBody) {
+        throw new ApiError(401, "Error while creating comment")
+    }
+    await commentBody.save()
+    const updatedPost = await Post.findByIdAndUpdate(postId, {
+        $push: { comments: commentBody._id }
+    }, { new: true })
+    res.status(201).json({
+        data: updatedPost,
+        success: true,
+        message: "comment added"
+    })
+})
+
+const deleteComment = asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as AuthRequest).user.id
+    const postId = req.params.postId
+    const commentId = req.params.commentId
+    const deletedComment = await Comment.deleteOne({ user: userId })
+    if (!deletedComment) {
+        throw new ApiError(400, "comment and post author can delete the comment")
+    }
+    const post = await Post.findByIdAndUpdate(postId, {
+        $pull: { comments: commentId }
+    })
+    if (!post) {
+        throw new ApiError(400, "Something went wrong while deleting a comment")
+    }
+    return res.status(200).json({
+        success: true,
+        message: "comment deleted"
+    })
+})
+
+
+
+export { createPost, deletePost, getAllPost, usersPost, createComment, deleteComment }

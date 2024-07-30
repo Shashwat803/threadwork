@@ -19,7 +19,8 @@ const postSchema = new mongoose.Schema<IPost>({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        index:true
+        index:true,
+        required:true
     },
     text: {
         type: String,

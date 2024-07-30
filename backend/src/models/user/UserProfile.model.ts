@@ -5,7 +5,7 @@ const userProfileSchema = new mongoose.Schema<IUserProfile>({
     userId:{
      type:mongoose.Schema.Types.ObjectId,
      ref:'User',
-    //  required:'true'
+     required:'true'
     },
     fullname: {
         type: String,

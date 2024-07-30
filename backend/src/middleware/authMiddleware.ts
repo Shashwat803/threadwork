@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import ApiError from '../utils/ApiError'
+import { AuthRequest } from '../interface/auth/IAuth'
 
-export interface AuthRequest extends Request {
-    user: any
-}
+
 
 const verifyJwt = (req: Request, res: Response, next: NextFunction) => {
     try {
