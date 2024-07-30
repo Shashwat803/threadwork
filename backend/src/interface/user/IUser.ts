@@ -3,7 +3,10 @@ import mongoose from "mongoose"
 export interface IUser {
     username: string,
     password: string,
-    refreshToken?:string
+    refreshToken?: string
+    isPasswordCorrect(password: string): Promise<boolean>,
+    generateAccessToken():string,
+    generateRefreshToken():string,
 }
 
 export interface IUserProfile {

@@ -1,6 +1,7 @@
 import express from "express"
 import connectDb from "./db/config"
 import * as dotenv from 'dotenv'
+import cookieParser from 'cookie-parser'
 import userRoute from './routes/authRoute'
 import postRoute from './routes/postRoute'
 import profileRoute from './routes/profileRoute'
@@ -10,6 +11,7 @@ dotenv.config()
 
 app.use(express.urlencoded({ extended: true })) // Parse URL-encoded bodies
 app.use(express.json()) // Parse JSON bodies
+app.use(cookieParser())
 
 
 app.use('/api/v1', userRoute)
