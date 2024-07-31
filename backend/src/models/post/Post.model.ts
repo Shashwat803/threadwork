@@ -12,7 +12,7 @@ const commentSchema = new mongoose.Schema<IComment>({
         trim: true,
         required: true
     }
-}, { timestamps: true })
+}, { timestamps: true, versionKey:false })
 
 
 const postSchema = new mongoose.Schema<IPost>({
@@ -41,7 +41,8 @@ const postSchema = new mongoose.Schema<IPost>({
 }, {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
+    versionKey:false
 })
 
 

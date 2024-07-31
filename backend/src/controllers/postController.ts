@@ -53,6 +53,10 @@ const deletePost = asyncHandler(async (req: Request, res: Response) => {
 
 const getAllPost = asyncHandler(async (req: Request, res: Response) => {
     const allPosts = await Post.find().select("text imagesOrVideos likes comments createdAt likeCount commentCount")
+    .populate({
+        path:'comments',
+        select:'-user -createdAt -updatedAt'
+    })
     return res.status(200).json({
         data: allPosts,
         success: true,
@@ -70,7 +74,7 @@ const usersPost = asyncHandler(async (req: Request, res: Response) => {
 })
 
 const createComment = asyncHandler(async (req: Request, res: Response) => {
-    const postId = req.params.id
+    const postId = req.params.postId
     const { comment } = req.body
     if (!comment) {
         throw new ApiError(400, "Comment empty")
@@ -89,7 +93,10 @@ const createComment = asyncHandler(async (req: Request, res: Response) => {
     await commentBody.save()
     const updatedPost = await Post.findByIdAndUpdate(postId, {
         $push: { comments: commentBody._id }
-    }, { new: true })
+    }, { new: true }).populate({
+        path: 'comments',
+        select:'-user -createdAt -updatedAt',
+    });
     res.status(201).json({
         data: updatedPost,
         success: true,
@@ -117,6 +124,35 @@ const deleteComment = asyncHandler(async (req: Request, res: Response) => {
     })
 })
 
+const createLike = asyncHandler(async (req: Request, res: Response) => {
+    const postId = req.params.id
+    const userId = (req as AuthRequest).user.id
+    const post = await Post.findByIdAndUpdate(postId, {
+        $push: { likes: userId }
+    }, { new: true })
+    if (!post) {
+        throw new ApiError(400, "Error while liking a post")
+    }
+    return res.status(201).json({
+        success: true,
+    })
+})
+
+const deleteLike = asyncHandler(async (req: Request, res: Response) => {
+    const postId = req.params.id
+    const userId = (req as AuthRequest).user.id
+    const post = await Post.findByIdAndUpdate(postId, {
+        $pull: { likes: userId }
+    }, { new: true })
+    if (!post) {
+        throw new ApiError(400, "Error while liking a post")
+    }
+    return res.status(200).json({
+        success: true,
+    })
+})
 
 
-export { createPost, deletePost, getAllPost, usersPost, createComment, deleteComment }
+
+
+export { createPost, deletePost, getAllPost, usersPost, createComment, deleteComment, createLike, deleteLike }
