@@ -3,6 +3,7 @@ import asyncHandler from "../utils/asyncHandler";
 import Profile from "../models/user/UserProfile.model";
 import ApiError from "../utils/ApiError";
 import cloudinaryUpload from "../utils/cloudinaryFileUpload";
+import { AuthRequest } from "../interface/auth/IAuth";
 
 // need to add user id
 const createProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -22,20 +23,20 @@ const createProfile = asyncHandler(async (req: Request, res: Response) => {
         profileImage: uploadedProfileImage
     })
     return res.status(201).json({
-      data:profile,
-      success:true,
-      message:"Profile created successfully"
+        data: profile,
+        success: true,
+        message: "Profile created successfully"
     })
 })
 
 const getOwnerProfile = asyncHandler(async (req: Request, res: Response) => {
-    //req.id of owner
-    const ownerProfile = await Profile.find()
+    const profileId = (req as AuthRequest).user.id
+    const ownerProfile = await Profile.findOne({ _id: profileId })
     return res.status(200).json({
-        data:ownerProfile,
-        success:true,
-        message:"Profile fetched successfully"
-      })
+        data: ownerProfile,
+        success: true,
+        message: "Profile fetched successfully"
+    })
 })
 // const getUserProfile
 export { createProfile, getOwnerProfile }
