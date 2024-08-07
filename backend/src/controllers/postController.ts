@@ -13,20 +13,23 @@ const createPost = asyncHandler(async (req: Request, res: Response) => {
     const { text, caption } = req.body
     const mediaFiles = req.files as Express.Multer.File[];
 
-    if (!text && !mediaFiles || !Array.isArray(mediaFiles) || mediaFiles.length === 0) {
+    if (!text && !mediaFiles) {
         throw new ApiError(400, "Content not found");
     }
 
-    const uploadPromises = mediaFiles.map(async (file) => {
-        const link = await cloudinaryUpload(file.path)
-        if (link === null) {
-            throw new Error(`Failed to upload file: ${file.originalname}`);
-        }
-        uploadedFiles.push(link)
-    })
+    if (mediaFiles && mediaFiles.length != 0) {
+        const uploadPromises = mediaFiles.map(async (file) => {
+            const link = await cloudinaryUpload(file.path)
+            if (link === null) {
+                throw new Error(`Failed to upload file: ${file.originalname}`);
+            }
+            uploadedFiles.push(link)
+        })
 
-    await Promise.all(uploadPromises)
+        await Promise.all(uploadPromises)
+    }
 
+    // user: (req as AuthRequest).user.id || 'abc',
     const post = await Post.create({
         user: (req as AuthRequest).user.id,
         text: text || '',
@@ -53,10 +56,10 @@ const deletePost = asyncHandler(async (req: Request, res: Response) => {
 
 const getAllPost = asyncHandler(async (req: Request, res: Response) => {
     const allPosts = await Post.find().select("text imagesOrVideos likes comments createdAt likeCount commentCount")
-    .populate({
-        path:'comments',
-        select:'-user -createdAt -updatedAt'
-    })
+        .populate({
+            path: 'comments',
+            select: '-user -createdAt -updatedAt'
+        })
     return res.status(200).json({
         data: allPosts,
         success: true,
@@ -95,7 +98,7 @@ const createComment = asyncHandler(async (req: Request, res: Response) => {
         $push: { comments: commentBody._id }
     }, { new: true }).populate({
         path: 'comments',
-        select:'-user -createdAt -updatedAt',
+        select: '-user -createdAt -updatedAt',
     });
     res.status(201).json({
         data: updatedPost,

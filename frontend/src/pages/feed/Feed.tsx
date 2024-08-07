@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Post from "../../components/post/Post";
 import { fetchAllPosts } from "../../api/APIEndpoints";
 import { IPost } from "../../interface/IPost";
+import UploadView from "../../components/UploadView";
 
 const Feed = () => {
   const { data, isPending, isError, error } = useQuery({
@@ -18,9 +19,12 @@ const Feed = () => {
     return <div>{error.message}</div>;
   }
 
-  console.log(Posts);
   return (
-    <div>
+    <div className="pt-20">
+      <div className="upload_view">
+        <UploadView />
+      </div>
+
       <div className="">
         {Posts &&
           Posts.length > 0 &&

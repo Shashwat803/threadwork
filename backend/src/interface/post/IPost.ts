@@ -14,3 +14,5 @@ export interface IPost {
     likes?: mongoose.Schema.Types.ObjectId[],
     comments?: mongoose.Schema.Types.ObjectId[],
 } 
+
+// user: mongoose.Schema.Types.ObjectId,
